@@ -1,18 +1,18 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import pathlib
-from tabulate import tabulate   # для красивого вывода таблиц
+from tabulate import tabulate  
 
-# настройки подключения (замените пароль на свой)
+
 DB_CONFIG = {
     "dbname": "otp_analysis",
     "user": "postgres",
-    "password": "NewStrongPass123",   # <-- вставьте сюда свой пароль
+    "password": "ваш_пароль",   
     "host": "localhost",
     "port": 5432
 }
 
-# путь к файлу queries.sql
+
 QUERIES_FILE = pathlib.Path(__file__).resolve().parent.parent / "sql" / "queries.sql"
 
 def load_queries(path):
@@ -31,7 +31,7 @@ def run_queries(conn, queries):
             if not rows:
                 print("Нет данных")
                 continue
-            # выводим максимум 10 строк для читаемости
+            
             print(tabulate(rows[:10], headers="keys", tablefmt="psql"))
             if len(rows) > 10:
                 print(f"... {len(rows)-10} more rows")
@@ -41,7 +41,7 @@ def main():
     print(f"Загружено {len(queries)} SQL-запросов из {QUERIES_FILE}")
 
     with psycopg2.connect(**DB_CONFIG) as conn:
-        run_queries(conn, queries)  # выполняем все запросы
+        run_queries(conn, queries)  
 
 if __name__ == "__main__":
     main()
