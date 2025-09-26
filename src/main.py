@@ -4,10 +4,11 @@ import pathlib
 from tabulate import tabulate  
 
 
+
 DB_CONFIG = {
     "dbname": "otp_analysis",
     "user": "postgres",
-    "password": "ваш_пароль",   
+    "password": "NewStrongPass123",   
     "host": "localhost",
     "port": 5432
 }
