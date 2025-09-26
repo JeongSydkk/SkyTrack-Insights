@@ -1,3 +1,4 @@
+-- Q1: Which airlines have the highest on-time departure rate? (Top 10 airlines)
 SELECT a.airline_name,
        ROUND(100.0 * SUM(f.departures_on_time)::NUMERIC / NULLIF(SUM(f.sectors_flown),0), 2) AS pct_ontime
 FROM facts_otp f
@@ -6,7 +7,7 @@ GROUP BY a.airline_name
 ORDER BY pct_ontime DESC
 LIMIT 10;
 
-
+-- Q2: Which routes have the highest delay percentage? (Top 10 routes)
 SELECT r.route_id,
        po1.port_name AS origin,
        po2.port_name AS destination,
@@ -19,7 +20,7 @@ GROUP BY r.route_id, po1.port_name, po2.port_name
 ORDER BY pct_delayed DESC
 LIMIT 10;
 
-
+-- Q3: What is the cancellation rate for each airline?
 SELECT a.airline_name,
        ROUND(100.0 * SUM(f.cancellations)::NUMERIC / NULLIF(SUM(f.sectors_scheduled),0), 2) AS pct_cancelled
 FROM facts_otp f
@@ -27,7 +28,7 @@ JOIN airlines a ON f.airline_id = a.airline_id
 GROUP BY a.airline_name
 ORDER BY pct_cancelled DESC;
 
-
+-- Q4: Which departure airports have the highest average monthly flights? (Top 15 ports)
 SELECT po.port_name,
        ROUND(AVG(f.sectors_flown),2) AS avg_monthly_flights
 FROM facts_otp f
@@ -37,7 +38,7 @@ GROUP BY po.port_name
 ORDER BY avg_monthly_flights DESC
 LIMIT 15;
 
-
+-- Q5: What is the total number of delays by month? (Seasonality analysis)
 SELECT c.month_num,
        c.month_label,
        SUM(f.departures_delayed + f.arrivals_delayed) AS total_delays
@@ -46,7 +47,8 @@ JOIN calendar_months c ON f.cal_id = c.cal_id
 GROUP BY c.month_num, c.month_label
 ORDER BY c.month_num;
 
-
+-- Q6: Do large airports perform better than small ones in punctuality?
+-- (Large = more than 5000 flights total)
 WITH port_stats AS (
   SELECT po.port_name,
          SUM(f.sectors_flown) AS total_flights,
@@ -61,7 +63,7 @@ SELECT CASE WHEN total_flights > 5000 THEN 'Large Port' ELSE 'Small Port' END AS
 FROM port_stats
 GROUP BY port_size;
 
-
+-- Q7: How has the number of Qantas flights changed over the years?
 SELECT c.year,
        SUM(f.sectors_flown) AS total_flights
 FROM facts_otp f
@@ -71,7 +73,7 @@ WHERE a.airline_name ILIKE '%Qantas%'
 GROUP BY c.year
 ORDER BY c.year;
 
-
+-- Q8: Which routes have the lowest delay percentage? (Top 10 best-performing routes)
 SELECT po1.port_name AS origin,
        po2.port_name AS destination,
        ROUND(100.0 * SUM(f.departures_delayed + f.arrivals_delayed)::NUMERIC / NULLIF(SUM(f.sectors_flown),0), 2) AS pct_delayed
@@ -84,7 +86,7 @@ HAVING SUM(f.sectors_flown) > 1000
 ORDER BY pct_delayed ASC
 LIMIT 10;
 
-
+-- Q9: What is the average percentage of delays by year?
 SELECT c.year,
        ROUND(100.0 * SUM(f.departures_delayed + f.arrivals_delayed)::NUMERIC / NULLIF(SUM(f.sectors_flown),0),2) AS avg_pct_delayed
 FROM facts_otp f
@@ -92,7 +94,7 @@ JOIN calendar_months c ON f.cal_id = c.cal_id
 GROUP BY c.year
 ORDER BY c.year;
 
-
+-- Q10: Which airlines improved punctuality the most over time?
 WITH yearly AS (
   SELECT a.airline_name,
          c.year,
